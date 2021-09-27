@@ -46,6 +46,7 @@ function adObserverCallback(mutations, observer) {
  */
 function block(element) {
     element.style.display = 'none';
+    rebut(element);
     const observer = new MutationObserver(adObserverCallback);
     observer.observe(element, { attributeFilter: ['class'] });
 }
@@ -65,11 +66,17 @@ function portalObserverCallback(mutations, observer) {
     }
 }
 
+unhidden(document.body);
 const bodyObserver = new MutationObserver(bodyObserverCallback);
 bodyObserver.observe(document.body, { attributeFilter: ['style'] });
 
 const portals = document.getElementsByClassName('__portal');
 for (const portal of portals) {
+    for (const element of portal.children) {
+        if (element instanceof HTMLElement) {
+            block(element);
+        }
+    }
     const observer = new MutationObserver(portalObserverCallback);
     observer.observe(portal, { childList: true });
 }
