@@ -1,10 +1,10 @@
 /**
  *
- * @param {HTMLBodyElement} body
+ * @param {HTMLElement} element
  */
-function block(body) {
-    if (body.style.overflow === 'hidden') {
-        body.style.overflow = null;
+function unhidden(element) {
+    if (element.style.overflow === 'hidden') {
+        element.style.overflow = null;
     }
 }
 
@@ -13,21 +13,63 @@ function block(body) {
  * @param {MutationRecord[]} mutations
  * @param {MutationObserver} observer
  */
-function callback(mutations, observer) {
+function bodyObserverCallback(mutations, observer) {
     for (const mutation of mutations) {
-        block(mutation.target);
+        unhidden(mutation.target);
     }
 }
 
-const observer = new MutationObserver(callback);
+/**
+ *
+ * @param {HTMLElement} element
+ */
+function rebut(element) {
+    if (element.classList.contains('overlay-enter-done')) {
+        element.style.display = null;
+    }
+}
 
-observer.observe(document.body, {
-    attributeFilter: ['style'],
-});
+/**
+ *
+ * @param {MutationRecord[]} mutations
+ * @param {MutationObserver} observer
+ */
+function adObserverCallback(mutations, observer) {
+    for (const mutation of mutations) {
+        rebut(mutation.target);
+    }
+}
+
+/**
+ *
+ * @param {HTMLElement} element
+ */
+function block(element) {
+    element.style.display = 'none';
+    const observer = new MutationObserver(adObserverCallback);
+    observer.observe(element, { attributeFilter: ['class'] });
+}
+
+/**
+ *
+ * @param {MutationRecord[]} mutations
+ * @param {MutationObserver} observer
+ */
+function portalObserverCallback(mutations, observer) {
+    for (const mutation of mutations) {
+        for (const node of mutation.addedNodes) {
+            if (node instanceof HTMLElement) {
+                block(node);
+            }
+        }
+    }
+}
+
+const bodyObserver = new MutationObserver(bodyObserverCallback);
+bodyObserver.observe(document.body, { attributeFilter: ['style'] });
 
 const portals = document.getElementsByClassName('__portal');
 for (const portal of portals) {
-    if (portal instanceof HTMLElement) {
-        portal.style.display = 'none';
-    }
+    const observer = new MutationObserver(portalObserverCallback);
+    observer.observe(portal, { childList: true });
 }
