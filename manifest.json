@@ -1,0 +1,16 @@
+{
+    "name": "Dcard Ad Block",
+    "description": "Block!",
+    "version": "1.0",
+    "manifest_version": 3,
+    "content_scripts": [
+        {
+            "matches": [
+                "https://www.dcard.tw/*"
+            ],
+            "js": [
+                "block.js"
+            ]
+        }
+    ]
+}
